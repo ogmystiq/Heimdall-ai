@@ -1,0 +1,19 @@
+{
+  "name": "heimdall",
+  "version": "1.0.0",
+  "description": "HEIMDALL — ett personligt AI-system (Jarvis) med röst, schema, agenter och projektstyrning",
+  "main": "server.js",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node launcher.js"
+  },
+  "dependencies": {
+    "imapflow": "^1.7.8",
+    "mailparser": "^3.9.46",
+    "web-push": "^3.6.7",
+    "ws": "^8.22.0"
+  }
+}

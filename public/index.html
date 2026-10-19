@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>HEIMDALL</title>
+  <meta name="theme-color" content="#04070c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HEIMDALL">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="scan"></div>
+
+  <!-- Låsskärm -->
+  <div id="lock" class="lock hidden">
+    <div class="lock-box">
+      <div class="mini-eye"></div>
+      <h1>HEIMDALL</h1>
+      <p>Ange din åtkomstkod</p>
+      <input id="lockInput" type="password" autocomplete="current-password" placeholder="••••••••">
+      <button id="lockBtn" class="btn primary">Lås upp</button>
+      <p id="lockErr" class="err"></p>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <span class="brand-name">HEIMDALL</span>
+      <span id="link" class="link-dot" title="Anslutning"></span>
+    </div>
+    <div class="hud">
+      <div class="hud-item"><span class="hud-l">TID</span><span id="clock" class="hud-v mono">--:--</span></div>
+      <div class="hud-item"><span class="hud-l">SKIFT</span><span id="shiftNow" class="hud-v">—</span></div>
+      <div class="hud-item pc-hud hidden" id="pcBox" title="Är datorn ansluten? Claude-jobb, video och datorstyrning kräver den."><span class="hud-l">DATOR</span><span id="pcTxt" class="hud-v">—</span></div>
+      <div class="hud-item budget" id="budgetBox" title="Claude-veckobudget kvar — tryck för att ändra">
+        <span class="hud-l">CLAUDE</span>
+        <span class="meter"><i id="budgetBar"></i></span>
+        <span id="budgetTxt" class="hud-v mono">100%</span>
+      </div>
+      <button id="ttsBtn" class="icon-btn" title="Röstsvar på/av" aria-label="Röstsvar"></button>
+      <button id="setBtn" class="icon-btn gear" title="Inställningar" aria-label="Inställningar"></button>
+    </div>
+  </header>
+
+  <main>
+    <!-- KÄRNA -->
+    <section id="v-core" class="view active">
+      <div class="core-wrap">
+      <div class="core">
+        <div class="eye-wrap">
+          <div id="eye" class="eye idle" aria-hidden="true">
+            <svg viewBox="0 0 400 400">
+              <defs>
+                <radialGradient id="coreG" cx="50%" cy="50%" r="50%">
+                  <stop offset="0" stop-color="#e8fbff"/>
+                  <stop offset=".35" style="stop-color:var(--accent)"/>
+                  <stop offset="1" style="stop-color:var(--accent);stop-opacity:0"/>
+                </radialGradient>
+              </defs>
+              <g class="ring r1"><circle cx="200" cy="200" r="182" class="dash-a"/></g>
+              <g class="ring r2"><circle cx="200" cy="200" r="160" class="ticks"/></g>
+              <g class="ring r3"><circle cx="200" cy="200" r="134" class="arc"/><circle cx="200" cy="200" r="134" class="arc arc2"/></g>
+              <g class="ring r4"><circle cx="200" cy="200" r="108" class="dash-b"/></g>
+              <g class="ring r5">
+                <path d="M200 70 L206 82 L194 82 Z" class="tri"/>
+                <path d="M200 330 L206 318 L194 318 Z" class="tri"/>
+                <path d="M70 200 L82 194 L82 206 Z" class="tri"/>
+                <path d="M330 200 L318 194 L318 206 Z" class="tri"/>
+              </g>
+              <circle cx="200" cy="200" r="70" class="core-glow" fill="url(#coreG)"/>
+              <circle cx="200" cy="200" r="34" class="core-dot"/>
+            </svg>
+            <canvas id="wave" width="400" height="400"></canvas>
+          </div>
+          <div id="eyeStatus" class="eye-status mono">VAKTAR</div>
+          <div id="modelBadge" class="model-badge mono" title="AI-modellen som senast svarade">MODELL: –</div>
+        </div>
+
+        <div class="deck" id="deck"></div>
+        <div class="incgoal" id="incGoal" data-incgoal="1"></div>
+        <div class="quick" id="quick"></div>
+
+        <div id="log" class="log"></div>
+
+        <form id="say" class="say" autocomplete="off">
+          <input id="sayInput" placeholder="Säg något till HEIMDALL…" enterkeyhint="send">
+          <button type="button" id="micBtn" class="mic" aria-label="Prata"><span></span></button>
+          <button type="submit" class="send" aria-label="Skicka">➤</button>
+        </form>
+      </div>
+      <aside class="side" id="side">
+        <div class="card"><div class="card-h"><span>Aktivitet</span><span class="pill ok" id="sideLive">LIVE</span></div><div id="activity" class="activity"></div></div>
+        <div class="card"><div class="card-h"><span>Pengar per vecka</span><span class="mono dim" id="moneySum"></span></div><div id="moneyChart" class="mchart"></div></div>
+      </aside>
+      </div>
+    </section>
+
+    <!-- SCHEMA -->
+    <section id="v-plan" class="view">
+      <div class="panel-head">
+        <h2>Schema</h2>
+        <button class="btn" id="addTaskBtn">+ Task</button>
+      </div>
+      <div id="week" class="week"></div>
+      <div class="plan-legend mono"><span><i class="lg-shift"></i>skift</span><span><i class="lg-task"></i>task med tid</span><span><i class="lg-now"></i>nu</span></div>
+      <div id="days" class="days"></div>
+    </section>
+
+    <!-- PROJEKT -->
+    <section id="v-proj" class="view">
+      <div class="panel-head"><h2>Projekt</h2></div>
+      <div id="monitors" class="monitors"></div>
+      <div class="panel-head sub"><h3>Automationer (n8n)</h3><button class="btn small" data-n8nref="1">Uppdatera</button></div>
+      <div id="n8nBox" class="flows"></div>
+      <div class="panel-head sub"><h3>Mål</h3></div>
+      <div id="goals" class="goals"></div>
+      <div class="panel-head sub"><h3>Pengar</h3></div>
+      <div id="money" class="money"></div>
+      <div id="moneyChart2" class="mchart wide"></div>
+      <div class="panel-head sub"><h3>Aktivitet</h3></div>
+      <div id="activity2" class="activity card"></div>
+      <div class="panel-head sub"><h3>Projekt</h3></div>
+      <div id="projects" class="projects"></div>
+      <div class="panel-head sub"><h3>Inkorg</h3></div>
+      <div id="mails" class="ideas"></div>
+      <div class="panel-head sub"><h3>Idébank</h3></div>
+      <div id="ideas" class="ideas"></div>
+    </section>
+
+    <!-- AGENTER -->
+    <section id="v-agents" class="view">
+      <div class="panel-head"><h2>Pengapotten</h2><button class="btn" data-pothunt="1">Leta förslag nu</button></div>
+      <div id="potBox" class="pot"></div>
+      <div class="panel-head sub"><h3>Agenter</h3></div>
+      <div id="agentsBox" class="jobs"></div>
+    </section>
+
+    <!-- VIDEO -->
+    <section id="v-video" class="view">
+      <div class="panel-head"><h2>Video</h2><span><button class="btn" id="trailerBtn">Trailer för sajt</button> <button class="btn" id="newVideoBtn">+ Projekt</button></span></div>
+      <div id="videoBox" class="jobs"></div>
+    </section>
+
+    <!-- JOBB -->
+    <section id="v-jobs" class="view">
+      <div class="panel-head"><h2>Claude-jobb</h2><span class="ph-r"><span id="weekCost" class="mono dim"></span><button class="btn" data-newjobany="1">+ Nytt jobb</button></span></div>
+      <div id="pcWarnJobs"></div>
+      <div id="jobs" class="jobs"></div>
+      <div class="panel-head sub"><h3>Datorjobb</h3></div>
+      <div id="agentRuns" class="jobs"></div>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <button data-v="core" class="on"><i class="n-core"></i><span>Kärna</span></button>
+    <button data-v="plan"><i class="n-plan"></i><span>Schema</span></button>
+    <button data-v="proj"><i class="n-proj"></i><span>Projekt</span></button>
+    <button data-v="agents"><i class="n-agents"></i><span>Agenter</span></button>
+    <button data-v="video"><i class="n-video"></i><span>Video</span></button>
+    <button data-v="jobs"><i class="n-jobs"></i><span>Jobb</span><b id="jobBadge" class="badge hidden"></b></button>
+  </nav>
+
+  <!-- Dialog -->
+  <div id="sheet" class="sheet hidden">
+    <div class="sheet-box">
+      <div id="sheetBody"></div>
+    </div>
+  </div>
+
+  <div id="toasts" class="toasts"></div>
+
+  <!-- Fokusläge -->
+  <div id="focus" class="focus hidden">
+    <div class="focus-ring"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" class="f-bg"/><circle cx="100" cy="100" r="90" class="f-fg" id="focusArc"/></svg>
+      <div class="focus-time mono" id="focusTime">50:00</div></div>
+    <div class="focus-task" id="focusTask"></div>
+    <div class="focus-sub mono">FOKUSLÄGE · BARA VIKTIGA NOTISER</div>
+    <button class="btn" id="focusStop">Avsluta</button>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

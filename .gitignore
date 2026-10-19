@@ -1,0 +1,9 @@
+# Dina egna grejer — följer aldrig med till GitHub och skrivs aldrig över vid uppdatering
+.env
+config.json
+data/*
+!data/.gitkeep
+node_modules/
+*.zip
+*.exe
+tools/

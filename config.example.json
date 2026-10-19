@@ -1,0 +1,30 @@
+{
+  "owner": "Ditt namn",
+  "about": "Skriv ett par meningar om dig själv: vad du jobbar med, vad du har för projekt och vad du vill uppnå. Agenterna använder det här för att ge förslag som passar just dig.",
+  "vocab": [],
+  "monitors": [],
+  "projects": [
+    {
+      "id": "ovrigt",
+      "name": "Övrigt",
+      "color": "#8aa0b4",
+      "description": "Allt annat",
+      "path": "",
+      "rules": ""
+    }
+  ],
+  "shifts": {
+    "cycleStart": "",
+    "pattern": [],
+    "types": {
+      "D": { "name": "Dag", "start": "07:00", "end": "16:00" },
+      "K": { "name": "Kväll", "start": "15:00", "end": "23:30" },
+      "N": { "name": "Natt", "start": "23:00", "end": "07:00" },
+      "L": { "name": "Ledig" }
+    }
+  },
+  "planning": {
+    "maxMinutesWorkday": 60,
+    "budgetResetDay": "enligt Claudes veckogräns"
+  }
+}

@@ -1,0 +1,36 @@
+# Render Blueprint — skapar HEIMDALL i molnet (gratis).
+# Render frågar efter värdena markerade sync: false när du skapar tjänsten.
+services:
+  - type: web
+    name: heimdall
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    autoDeploy: true
+    buildCommand: npm install --omit=dev --no-audit --no-fund
+    startCommand: node cloud-start.js
+    healthCheckPath: /api/ping
+    envVars:
+      - key: MODE
+        value: cloud
+      - key: TZ
+        value: Europe/Stockholm
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATA_REPO
+        sync: false
+      - key: HEIMDALL_TOKEN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY_2
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: N8N_URL
+        sync: false
+      - key: N8N_API_KEY
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
