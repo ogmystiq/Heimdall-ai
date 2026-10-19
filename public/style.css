@@ -721,3 +721,38 @@ details.hist summary { padding: 10px 12px; cursor: pointer; font-size: 13px; col
 }
 
 .qb.own { border-color: rgba(167,123,255,.55); color: #d6c2ff; font-weight: 600; }
+
+/* ===== Mobil: chatten först ===== */
+.dash-mini { display: none; }
+@media (max-width: 700px) {
+  /* Ögat blir en liten rad högst upp när chatten används */
+  .core.chatting .eye-wrap { flex-direction: row; justify-content: center; gap: 12px; padding: 0; }
+  .core.chatting .eye { width: 64px; }
+  .core.chatting .eye-status { margin: 0; font-size: 10px; letter-spacing: .25em; }
+  .core.chatting .model-badge { margin: 0; font-size: 9px; padding: 2px 8px; }
+  .core.chatting .eye-wrap > div:not(.eye) { order: 2; }
+
+  /* Översikten: en rad, tryck för att fälla ut */
+  .dash-mini { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 10px; padding: 9px 12px; border-radius: 12px; cursor: pointer;
+    border: 1px solid var(--cardb); background: var(--card); color: var(--text); font-size: 13px; text-align: left; flex-shrink: 0; }
+  .dash-mini .dm-s { white-space: nowrap; font-weight: 600; font-size: 12px; }
+  .dash-mini .dm-t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dash-mini .dm-n { font-size: 10.5px; color: var(--dim); white-space: nowrap; }
+  .dash-mini .dm-chev { width: 8px; height: 8px; border-right: 1.5px solid var(--dim); border-bottom: 1.5px solid var(--dim); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex-shrink: 0; }
+  .core.dash-open .dash-mini .dm-chev { transform: rotate(-135deg) translateY(-2px); }
+  .core:not(.dash-open) .dash { display: none; }
+  .dash { flex-shrink: 0; }
+  .deck { padding-top: 8px; gap: 6px; }
+  .dk { padding: 8px 10px; }
+  .quick { padding-top: 8px; }
+  .qb { padding: 6px 11px; font-size: 11.5px; }
+
+  /* Skrivläge: bara chatten och inmatningen */
+  .core.composing .eye-wrap, .core.composing .dash, .core.composing .dash-mini, .core.composing .quick { display: none !important; }
+  .msg { font-size: 15px; max-width: 92%; }
+  .log { padding-top: 10px; }
+
+  /* Tangentbordet uppe: göm menyn och lyft appen */
+  body.kb .nav { display: none; }
+  body.kb main { bottom: var(--kb, 0px); }
+}

@@ -183,8 +183,35 @@ function renderToday() {
     <div class="dk" data-go="plan"><div class="dk-l">IDAG <b>${doneN}/${todays.length}</b></div>${taskCard}<div class="dk-bar"><i style="width:${todays.length ? Math.round(doneN / todays.length * 100) : 0}%"></i></div></div>
     <div class="dk sys" data-go="jobs"><div class="dk-l">SYSTEM</div>${rows.map(([l, v, c]) => `<div class="sy"><span>${l}</span><b class="c-${c}">${v}</b></div>`).join('')}</div>`;
   paint($('#deck'), html, html);
+  // Mobil: en rad med det viktigaste — tryck för att fälla ut korten
+  const shiftShort = !S.hasShifts && S.hasShifts !== undefined ? '' : !sn ? '' : sn.live ? `${sn.s.name} · ${until(sn.sp.end - now)} kvar` : `${sn.s.name} ${sn.s.date === S.today ? 'idag' : sn.s.date === addDays(S.today, 1) ? 'imorgon' : sn.s.weekday} ${sn.s.start}`;
+  const goal = S.settings.incomeGoal;
+  const mini = `${shiftShort ? `<span class="dm-s s-${esc(sn.s.code)}">${esc(shiftShort)}</span>` : ''}
+    <span class="dm-t">${next ? `☐ ${esc(next.title)}${next.time ? ' ' + esc(next.time) : ''}` : todays.length ? 'Allt klart ✓' : 'Inget idag'}</span>
+    <span class="dm-n mono">${doneN}/${todays.length}${goal ? ` · ${Math.round(monthIncome() / 1000 * 10) / 10}k/${Math.round(goal / 1000)}k` : ''}</span><i class="dm-chev"></i>`;
+  paint($('#dashMini'), mini, mini);
   renderIncomeGoal();
   renderQuick();
+}
+
+// Mobil: översikten ihopfälld som standard, chatten får plats
+const coreEl = $('.core');
+let dashOpen = false; try { dashOpen = localStorage.getItem('h_dash') === '1'; } catch {}
+coreEl.classList.toggle('dash-open', dashOpen);
+$('#dashMini').onclick = () => { dashOpen = !dashOpen; coreEl.classList.toggle('dash-open', dashOpen); try { localStorage.setItem('h_dash', dashOpen ? '1' : '0'); } catch {} };
+// Skrivläge: när du skriver på mobilen visas bara chatten
+const isPhone = () => matchMedia('(max-width: 700px)').matches;
+$('#sayInput').addEventListener('focus', () => { if (isPhone()) { coreEl.classList.add('composing'); toBottom(); } });
+$('#sayInput').addEventListener('blur', () => setTimeout(() => coreEl.classList.remove('composing'), 150));
+// Tangentbordet på iPhone: krymp appen så inmatningen syns och menyn göms
+if (window.visualViewport) {
+  const fit = () => {
+    const kb = Math.max(0, window.innerHeight - visualViewport.height - visualViewport.offsetTop);
+    document.documentElement.style.setProperty('--kb', kb + 'px');
+    document.body.classList.toggle('kb', kb > 80);
+    if (kb > 80) toBottom();
+  };
+  visualViewport.addEventListener('resize', fit); visualViewport.addEventListener('scroll', fit);
 }
 
 // Nedräkningen till skiftet hålls färsk
